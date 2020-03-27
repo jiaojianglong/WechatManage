@@ -1,0 +1,18 @@
+
+结束符： |EOF|
+分隔符：*|*
+
+
+监听端口：用来监听消息，收消息
+
+连接成功：Success*|*监听端口连接成功
+消息： Messg*|*message_type*|*status*|*
+
+
+控制端口：
+连接成功： Success*|*控制端口连接成功
+
+启动微信：Login*|*WechatWin.dll所在目录（版本要求2.6.8.51）*|*注入文件位置
+
+发送文本消息：Text*|*user_id*|*text
+发送图片：Image*|*user_id*|*image_path
