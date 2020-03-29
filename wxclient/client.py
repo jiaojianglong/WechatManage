@@ -1,18 +1,15 @@
-
 import socket
 import time
-import requests
 
 from tornado import gen
 from tornado.tcpclient import TCPClient
 from tornado.queues import Queue
 
-from .message import Message
+from message import message
 from settings import WXPath, ADDFile
-from settings import QAURL
+
 
 class TcpClient(object):
-
     def __init__(self, host, accept_port, send_port):
         self.host = host
         self.accept_port = accept_port
@@ -41,13 +38,14 @@ class TcpClient(object):
             if msg.get("get_return"):
                 self.send_stream.write(msg.get("msg").encode("gbk"))
                 res = yield self.send_stream.read_until(self.delimiter)
-                res = {"res":res, "id":msg.get("id")}
+                res = {"res": res, "id": msg.get("id")}
                 self.accept_queue.append(res)
             else:
                 self.send_stream.write(msg.get("msg").encode("gbk"))
+
     @gen.coroutine
     def send_and_return(self, msg):
-        msg = {"msg":self.decollator.join(msg), "get_return":True, "id":time.time()}
+        msg = {"msg": self.decollator.join(msg), "get_return": True, "id": time.time()}
         self.send_queue.put(msg)
         while True:
             for res in self.accept_queue:
@@ -70,11 +68,6 @@ class TcpClient(object):
     @gen.coroutine
     def handle_message(self, msg):
         print(msg)
-        msg = Message(msg)
-        if msg.type == "Success":
-            print(msg.text)
-        if msg.type == "Messg":
-            if msg.category == "text": # text
-                res = requests.post(QAURL, data={"content":msg.text})
-                reply_msg = res.json().get("data",{}).get("answer",{}).get("answer")
-                self.send(["Text", msg.from_, reply_msg])
+        msg = message(self, msg)
+        if msg:
+            msg.reply()

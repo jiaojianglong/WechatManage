@@ -1,21 +1,18 @@
-
-
-
-
-class Message():
+class BaseMessage(object):
     category_dict = {
-        "1":"text",
-        "3":"picture",
-        "37":"addfriend",
-        "34":"voice",
-        "42":"wecard",
-        "43":"vedio",
-        "47":"emoticon",
-        "49":"file",
-        "10000":"notice",
+        "1": "text",
+        "3": "picture",
+        "37": "addfriend",
+        "34": "voice",
+        "42": "wecard",
+        "43": "vedio",
+        "47": "emoticon",
+        "49": "file",
+        "10000": "notice",
     }
 
-    def __init__(self, msg):
+    def __init__(self, client, msg):
+        self.client = client
         self.msg = msg
         self.decollator = "*|*"
         self.type = None
@@ -40,4 +37,10 @@ class Message():
             self.member = msg_list[4]
 
     def _get_category(self, num):
-        return self.category_dict.get(num,"None")
+        return self.category_dict.get(num, "None")
+
+    def reply(self):
+        raise Exception
+
+    def reply_text(self, text):
+        self.client.send(["Text", self.from_, text])
